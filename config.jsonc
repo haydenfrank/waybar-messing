@@ -13,7 +13,9 @@
   "modules-right": [],
   "custom/clock": {
     "exec": "~/.config/waybar/scripts/clock.sh",
-    "interval": 1
+    "interval": 1,
+    "return-type": "json",
+    "tooltip": true
   },
 
   "hyprland/workspaces": {
