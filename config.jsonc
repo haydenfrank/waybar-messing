@@ -2,7 +2,7 @@
   "position": "top",
   "margin-top": 7,
 
-  "modules-left": ["clock", "hyprland/workspaces"],
+  "modules-left": ["custom/clock", "hyprland/workspaces"],
   "modules-center": ["tray"],
   "modules-right": [
     "pulseaudio",
@@ -10,9 +10,9 @@
     "battery",
     "custom/notification"
   ],
-  "clock": {
-    "interval": 1,
-    "format": "{:%OI:%M:%S %p %a, %D}"
+  "custom/clock": {
+    "exec": "~/.config/waybar/scripts/clock.sh",
+    "interval": 1
   },
 
   "hyprland/workspaces": {
