@@ -7,7 +7,6 @@
   "modules-center": [
     "custom/clock",
     "hyprland/workspaces",
-    "tray",
     "network",
     "battery"
   ],
@@ -18,15 +17,23 @@
   },
 
   "hyprland/workspaces": {
-    "all-outputs": true,
-    "format": "{name}",
+    "format": " <b>{icon}</b> {windows} ",
+    "window-rewrite-default": "",
     "persistent-workspaces": {
       "*": [1, 2, 3, 4, 5]
-    }
-  },
-  "tray": {
-    "icon-size": 21,
-    "spacing": 10
+    },
+    "window-rewrite": {
+      "kitty": "󰞷",
+      "slack": "󰒱",
+      "spotify": "󰓇",
+      "Brave": "",
+      "Discord": "",
+      "Steam": ""
+    },
+    "all-outputs": true,
+    "on-scroll-up": "hyprctl dispatch workspace e+1",
+    "on-scroll-down": "hyprctl dispatch workspace e-1",
+    "on-click": "activate"
   },
   "pulseaudio": {
     "format": "{volume}% {icon}",
