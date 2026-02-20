@@ -68,13 +68,12 @@
   },
   "battery": {
     "interval": 60,
-    "states": {
-      "warning": 30,
-      "critical": 15
-    },
     "format": "{icon}",
-    "format-icons": ["", "", "", "", ""],
-    "max-length": 25
+    "format-icons": {
+      "default": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+      "charging": ["󰢟", "󰢜", "󰂆", "󰂇", "󰂈", "󰢝", "󰂉", "󰢞", "󰂊", "󰂋", "󰂅"]
+    },
+    "tooltip-format": "{capacity}% - {time}"
   },
   "custom/notification": {
     "tooltip": true,
