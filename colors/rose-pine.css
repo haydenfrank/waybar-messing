@@ -1,0 +1,65 @@
+/*
+* Variant: Rosé Pine
+* Maintainer: DankChoir
+*/
+
+@define-color base            #191724;
+@define-color surface         #1f1d2e;
+@define-color overlay         #26233a;
+
+@define-color muted           #6e6a86;
+@define-color subtle          #908caa;
+@define-color text            #e0def4;
+
+@define-color love            #eb6f92;
+@define-color gold            #f6c177;
+@define-color rose            #ebbcba;
+@define-color pine            #31748f;
+@define-color foam            #9ccfd8;
+@define-color iris            #c4a7e7;
+
+@define-color highlightLow    #21202e;
+@define-color highlightMed    #403d52;
+@define-color highlightHigh   #524f67;
+
+/*
+ * Compatibility aliases for gruvbox-style variables
+ * These map the gruvbox variable names to the Rosé Pine palette
+ * so you can swap themes without rewriting configs that reference
+ * the gruvbox variable names.
+ */
+
+@define-color bg #191724;
+@define-color red #eb6f92;
+@define-color green #31748f;
+@define-color yellow #f6c177;
+@define-color blue #31748f;
+@define-color purple #c4a7e7;
+@define-color aqua #9ccfd8;
+@define-color gray #6e6a86;
+
+@define-color gray-alt #908caa;
+@define-color red-bright #ebbcba;
+@define-color green-bright #9ccfd8;
+@define-color yellow-bright #f6c177;
+@define-color blue-bright #9ccfd8;
+@define-color purple-bright #c4a7e7;
+@define-color aqua-bright #9ccfd8;
+@define-color fg #e0def4;
+
+@define-color bg0_h #191724;
+@define-color bg0 #191724;
+@define-color bg1 #1f1d2e;
+@define-color bg2 #26233a;
+@define-color bg3 #21202e;
+@define-color bg4 #403d52;
+@define-color gray-dark #6e6a86;
+@define-color orange #f6c177;
+
+@define-color bg0_s #26233a;
+@define-color fg4 #6e6a86;
+@define-color fg3 #908caa;
+@define-color fg2 #e0def4;
+@define-color fg1 #e0def4;
+@define-color fg0 #e0def4;
+@define-color orange-bright #f6c177;
