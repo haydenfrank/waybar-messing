@@ -102,4 +102,23 @@ else
   echo "Restarted waybar"
 fi
 
+# Also update terminal colors if matching sequences exist for the chosen theme
+SEQ_DIR="$HOME/.config/fish/terminal-sequences"
+SEQ_FILE="$SEQ_DIR/${COLOR}.txt"
+if [ -f "$SEQ_FILE" ]; then
+  me=$(id -un)
+  # Send the terminal escape sequences to all pseudo-terminals owned by the current user
+  for tty in /dev/pts/*; do
+    [ -e "$tty" ] || continue
+    [ "$tty" = "/dev/ptmx" ] && continue
+    owner=$(stat -c %U "$tty" 2>/dev/null || true)
+    if [ "$owner" = "$me" ]; then
+      # Ignore errors writing to a tty
+      cat "$SEQ_FILE" > "$tty" 2>/dev/null || true
+      clear
+    fi
+  done
+  echo "Updated terminal colors from: $SEQ_FILE"
+fi
+
 echo "Switched colors to: $COLOR"
