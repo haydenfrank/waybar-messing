@@ -1,7 +1,7 @@
 {
   "position": "top",
-  "margin-top": 17,
-  "margin-bottom": 17,
+  "margin-top": 5,
+  "margin-bottom": 2,
 
   "modules-left": [],
   "modules-center": [
@@ -30,7 +30,8 @@
       "spotify": "󰓇",
       "Brave": "",
       "Discord": "",
-      "Steam": ""
+      "Steam": "",
+      "Zoom": ""
     },
     "all-outputs": true,
     "on-scroll-up": "hyprctl dispatch workspace e+1",
