@@ -48,6 +48,8 @@ tooltip label {
     border-radius: 45px;
     background-color: transparent;
     transition: all 0.3s ease-in-out;
+    /* keep workspace labels a consistent, readable size */
+    font-size: 14px;
 }
 
 #workspaces button.hosting-monitor.visible {
@@ -55,7 +57,6 @@ tooltip label {
     color: @bg0;
     min-width: 45px;
     transition: all 0.3s ease-in-out;
-    font-size: 13px;
 }
 
 #workspaces button:not(.hosting-monitor).visible {
@@ -63,7 +64,6 @@ tooltip label {
     color: @bg0;
     min-width: 45px;
     transition: all 0.3s ease-in-out;
-    font-size: 13px;
 }
 
 #workspaces button:hover {
