@@ -125,3 +125,15 @@ printf '\033[0m' > "$tty" 2>/dev/null || true
 fi
 
 echo "Switched colors to: $COLOR"
+
+# Persist the active theme for other tools (fish config uses this on startup)
+FISH_CUR_DIR="$HOME/.config/fish"
+FISH_CUR_FILE="$FISH_CUR_DIR/current_theme"
+mkdir -p "$FISH_CUR_DIR"
+printf "%s\n" "$COLOR" > "$FISH_CUR_FILE"
+
+# If the theme has terminal sequences, also copy them to an "active" file so
+# new terminals can source a single known path (optional, convenient)
+if [ -f "$SEQ_FILE" ]; then
+  cp -a "$SEQ_FILE" "$SEQ_DIR/active.txt"
+fi
