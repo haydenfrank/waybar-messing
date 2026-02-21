@@ -114,10 +114,13 @@ if [ -f "$SEQ_FILE" ]; then
     owner=$(stat -c %U "$tty" 2>/dev/null || true)
     if [ "$owner" = "$me" ]; then
       # Ignore errors writing to a tty
-      cat "$SEQ_FILE" > "$tty" 2>/dev/null || true
-      clear
+      # send sequences without trailing newline
+printf "%s" "$(cat "$SEQ_FILE")" > "$tty" 2>/dev/null || true
+
+# hard reset formatting
+printf '\033[0m' > "$tty" 2>/dev/null || true
     fi
-  done
+    done
   echo "Updated terminal colors from: $SEQ_FILE"
 fi
 
