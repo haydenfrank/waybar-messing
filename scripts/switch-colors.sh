@@ -52,6 +52,20 @@ if [ ! -f "$COLOR_FILE" ]; then
   exit 3
 fi
 
+# Update rofi theme symlink
+ROFI_THEME_DIR="$HOME/.local/share/rofi/themes"
+ROFI_LINK="$ROFI_THEME_DIR/curr_theme.rasi"
+ROFI_THEME_FILE="$ROFI_THEME_DIR/colors/$COLOR.rasi"
+
+mkdir -p "$ROFI_THEME_DIR"
+
+if [ -f "$ROFI_THEME_FILE" ]; then
+  ln -sfn "$ROFI_THEME_FILE" "$ROFI_LINK"
+  echo "Updated rofi theme symlink -> $ROFI_THEME_FILE"
+else
+  echo "No matching rofi theme found at $ROFI_THEME_FILE (skipping rofi update)"
+fi
+
 TS=$(date +%s)
 
 # Update each style's style.css to import the chosen color file
