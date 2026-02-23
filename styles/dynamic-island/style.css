@@ -50,6 +50,7 @@ tooltip label {
     transition: all 0.3s ease-in-out;
     /* keep workspace labels a consistent, readable size */
     font-size: 14px;
+    color: @fg
 }
 
 #workspaces button.hosting-monitor.visible {
@@ -96,7 +97,7 @@ tooltip label {
 }
 
 #custom-clock {
-    color: @blue;
+    color: @fg;
     margin-left: 0;
 }
 

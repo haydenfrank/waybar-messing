@@ -29,10 +29,10 @@ tooltip label {
 
 
 #workspaces {
-    background-color: @bg0;
     padding: 5px 3px;
     margin: 0 0 0 12px;
     border-radius: 18px;
+    background-color: @bg0;
     border: 1px solid @bg1;
     color: @fg;
 }
@@ -42,6 +42,7 @@ tooltip label {
     margin: 0px 3px;
     border-radius: 45px;
     background-color: @bg1;
+    color: @fg;
     transition: all 0.3s ease-in-out;
 }
 
@@ -91,7 +92,7 @@ tooltip label {
 }
 
 #custom-clock {
-    color: @blue;
+    color: @fg;
 }
 
 #custom-notification {
