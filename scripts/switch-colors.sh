@@ -157,6 +157,7 @@ if [ -d "$WALL_DIR" ]; then
     fi
 
     swww img "$RANDOM_WALL" -t wipe --transition-fps 165 --transition-duration 0.3
+    cp -a "$RANDOM_WALL" "$WALL_BASE/active_wallpaper"
     echo "Set random wallpaper: $RANDOM_WALL"
   else
     echo "No wallpapers found in $WALL_DIR"
