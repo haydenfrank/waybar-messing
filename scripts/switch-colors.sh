@@ -140,6 +140,31 @@ fi
 
 echo "Switched colors to: $COLOR"
 
+# --- Random wallpaper per theme ---
+WALL_BASE="$HOME/Pictures/Wallpapers"
+WALL_DIR="$WALL_BASE/$COLOR"
+
+if [ -d "$WALL_DIR" ]; then
+  mapfile -t WALLS < <(find "$WALL_DIR" -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.webp" \))
+
+  if [ "${#WALLS[@]}" -gt 0 ]; then
+    RANDOM_WALL="${WALLS[$RANDOM % ${#WALLS[@]}]}"
+    
+    # Ensure swww daemon is running
+    if ! pgrep -x swww-daemon >/dev/null; then
+      swww-daemon >/dev/null 2>&1 &
+      sleep 0.3
+    fi
+
+    swww img "$RANDOM_WALL" -t wipe --transition-fps 165 --transition-duration 0.3
+    echo "Set random wallpaper: $RANDOM_WALL"
+  else
+    echo "No wallpapers found in $WALL_DIR"
+  fi
+else
+  echo "Wallpaper directory not found: $WALL_DIR"
+fi
+
 # Persist the active theme for other tools (fish config uses this on startup)
 FISH_CUR_DIR="$HOME/.config/fish"
 FISH_CUR_FILE="$FISH_CUR_DIR/current_theme"
