@@ -61,6 +61,30 @@ else
   SPICETIFY_BIN="$(command -v spicetify)"
 fi
 
+# Before stopping Spotify, try to detect which Hyprland workspace Spotify is on.
+# We capture this now because after killing the process the client entry will
+# disappear from hyprctl's client list. Use robust jq extraction so we return
+# the workspace id as a plain string regardless of how hyprctl represents it.
+SPOT_WS_PRE=""
+if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+  # Try a deterministic two-step detection:
+  # 1) Match by window class (exact-ish) which is the most reliable.
+  # 2) If none, match by title (but avoid common terminal classes so we don't
+  #    accidentally pick a terminal mentioning Spotify in its title).
+  SPOT_WS_PRE=""
+  if command -v hyprctl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    SPOT_WS_PRE=$(hyprctl -j clients 2>/dev/null | jq -r '.[]
+      | select((.class//"" | test("(?i)^spotify$")) or (.initialClass//"" | test("(?i)^spotify$")))
+      | (.workspace.id // .workspace // .workspaceid // .workspace_id) | tostring' | head -n1 || true)
+
+    if [ -z "${SPOT_WS_PRE}" ]; then
+      SPOT_WS_PRE=$(hyprctl -j clients 2>/dev/null | jq -r '.[]
+        | select((.title//"" | test("(?i)spotify")) and ((.class//"" | test("(?i)kitty|alacritty|wezterm|xterm|konsole|gnome-terminal|terminator|termite|st|rxvt"))|not))
+        | (.workspace.id // .workspace // .workspaceid // .workspace_id) | tostring' | head -n1 || true)
+    fi
+  fi
+fi
+
 # Stop Spotify: handle Flatpak and regular installs
 flatpak kill com.spotify.Client 2>/dev/null || pkill -x spotify 2>/dev/null || true
 
@@ -71,8 +95,91 @@ flatpak kill com.spotify.Client 2>/dev/null || pkill -x spotify 2>/dev/null || t
 # Apply the theme changes — let failures surface so they can be diagnosed
 "$SPICETIFY_BIN" apply
 
-# Restart Spotify (Flatpak) in background
-flatpak run com.spotify.Client >/dev/null 2>&1 &
+# Try to relaunch Spotify on the same Hyprland workspace it was closed from.
+# We only attempt this when both `hyprctl` and `jq` are available and we can
+# detect the workspace that Spotify was on. If detection fails we fall back to
+# the simple background restart used previously.
+launch_spotify_on_same_workspace() {
+  # require hyprctl and jq
+  if ! command -v hyprctl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+    return 1
+  fi
+
+  # detect current workspace (so we can restore it after launching)
+  ORIG_WS=""
+  if hyprctl -j activeworkspace >/dev/null 2>&1; then
+    ORIG_WS=$(hyprctl -j activeworkspace 2>/dev/null | jq -r '.id|tostring' || true)
+  else
+    ORIG_WS=$(hyprctl -j workspaces 2>/dev/null | jq -r '.[] | select(.visible==true or .focused==true or .active==true) | .id|tostring' | head -n1 || true)
+  fi
+
+  # Prefer the workspace we detected before killing Spotify, fall back to
+  # live detection if that's empty.
+  SPOT_WS="${SPOT_WS_PRE:-}"
+  if [ -z "${SPOT_WS}" ]; then
+    SPOT_WS=$(hyprctl -j clients 2>/dev/null | jq -r '
+      ( .[] | select((.class//""|test("(?i)spotify")) or (.initialClass//""|test("(?i)spotify")))
+        | ( ( .workspace | if type=="object" then (.id|tostring) else (.|tostring) end)
+            // (.workspaceid|tostring)
+            // (.workspace_id|tostring)
+            // "" )
+      )
+      // (
+        ( .[] | select((.title//""|test("(?i)spotify")) and ((.class//"" | test("(?i)kitty|alacritty|wezterm|xterm|konsole|gnome-terminal|terminator|termite|st|rxvt"))|not))
+        | ( ( .workspace | if type=="object" then (.id|tostring) else (.|tostring) end)
+            // (.workspaceid|tostring)
+            // (.workspace_id|tostring)
+            // "" )
+      )
+    ' | head -n1 || true)
+  fi
+
+  if [ -z "${SPOT_WS:-}" ]; then
+    return 2
+  fi
+
+  # Switch to Spotify's workspace, start Spotify there, then restore original workspace.
+  hyprctl dispatch workspace "$SPOT_WS" 2>/dev/null || true
+
+  # Launch Spotify in background
+  flatpak run com.spotify.Client >/dev/null 2>&1 &
+
+  # Wait until Hyprland reports a Spotify client on the desired workspace.
+  # Poll for up to 5s; if not found we restore the original workspace anyway.
+  FOUND=0
+  for i in $(seq 1 50); do
+    sleep 0.01
+    CUR_WS=$(hyprctl -j clients 2>/dev/null | jq -r '
+      .[]
+      | select((.class//""|test("(?i)spotify")) or (.title//""|test("(?i)spotify")))
+      | ( ( .workspace | if type=="object" then (.id|tostring) else (.|tostring) end)
+          // (.workspaceid|tostring)
+          // (.workspace_id|tostring)
+          // "" )
+    ' | head -n1 || true)
+
+    if [ -n "${CUR_WS}" ] && [ "${CUR_WS}" = "${SPOT_WS}" ]; then
+      FOUND=1
+      break
+    fi
+  done
+
+  if [ "$FOUND" -ne 1 ]; then
+    # Could not detect Spotify on target workspace; continue but restore view
+    :
+  fi
+
+  if [ -n "${ORIG_WS:-}" ]; then
+    hyprctl dispatch workspace "$ORIG_WS" 2>/dev/null || true
+  fi
+
+  return 0
+}
+
+# Try the hyprland-aware launcher, fall back to a plain restart
+if ! launch_spotify_on_same_workspace; then
+  flatpak run com.spotify.Client >/dev/null 2>&1 &
+fi
 
 # Update rofi theme symlink
 ROFI_THEME_DIR="$HOME/.local/share/rofi/themes"
