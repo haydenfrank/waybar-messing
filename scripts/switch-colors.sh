@@ -52,6 +52,8 @@ if [ ! -f "$COLOR_FILE" ]; then
   exit 3
 fi
 
+gsettings set org.gnome.desktop.interface gtk-theme "$COLOR"
+
 # Try to find spicetify binary (Waybar may run with a limited PATH)
 if ! command -v spicetify >/dev/null 2>&1; then
   SPICETIFY_BIN="$HOME/.spicetify/spicetify"
