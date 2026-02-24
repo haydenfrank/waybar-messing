@@ -52,6 +52,26 @@ if [ ! -f "$COLOR_FILE" ]; then
   exit 3
 fi
 
+# Try to find spicetify binary (Waybar may run with a limited PATH)
+if ! command -v spicetify >/dev/null 2>&1; then
+  SPICETIFY_BIN="$HOME/.spicetify/spicetify"
+else
+  SPICETIFY_BIN="$(command -v spicetify)"
+fi
+
+# Stop Spotify: handle Flatpak and regular installs
+flatpak kill com.spotify.Client 2>/dev/null || pkill -x spotify 2>/dev/null || true
+
+# Set spicetify settings (use separate invocations to avoid argument parsing issues)
+"$SPICETIFY_BIN" config current_theme "Default"
+"$SPICETIFY_BIN" config color_scheme "$COLOR"
+
+# Apply the theme changes — let failures surface so they can be diagnosed
+"$SPICETIFY_BIN" apply
+
+# Restart Spotify (Flatpak) in background
+flatpak run com.spotify.Client >/dev/null 2>&1 &
+
 # Update rofi theme symlink
 ROFI_THEME_DIR="$HOME/.local/share/rofi/themes"
 ROFI_LINK="$ROFI_THEME_DIR/curr_theme.rasi"
